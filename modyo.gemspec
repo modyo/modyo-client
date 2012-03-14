@@ -1,3 +1,7 @@
+# -*- encoding : utf-8 -*-
+
+require 'modyo/version'
+
 Gem::Specification.new do |s|
   s.name = "modyo"
   s.summary = "Modyo SDK"
