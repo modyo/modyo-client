@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.summary = "Modyo SDK"
   s.description = "Modyo Platform SDK for Ruby"
   s.files = Dir["{app,lib,config}/**/*"] + ["MIT-LICENSE", "Rakefile", "Gemfile", "README.rdoc"]
-  s.version = "0.0.1"
+  s.version = Modyo::VERSION
   s.platform                  = Gem::Platform::RUBY
   s.authors                   = [ "Ivan Gonzalez <itech>", "Toño Silva Portell <jcode>" ]
   s.email                     = [ "support@modyo.com" ]
