@@ -1,0 +1,77 @@
+= Modyo Connect Gem version 0.0.1
+
+Install
+If you're using Bundle add this your gemfile:
+
+    gem 'modyo', :git => 'git://github.com/modyo/modyo.git'
+
+Add to your app the following files:
+(/config/initializers/modyo.rb)
+
+
+    require 'oauth'
+    require 'nokogiri'
+
+    ::MODYO = {}
+    begin
+    	yaml_file = YAML.load_file("#{Rails.root}/config/modyo.yml")
+    
+    rescue Exception => e
+    		raise StandardError, "config/modyo.yml could not be loaded."
+    end
+    
+    if yaml_file
+    	if yaml_file[Rails.env]
+    		MODYO.merge!(yaml_file[Rails.env])
+  	else
+    		raise StandardError, "config/modyo.yml exists, but doesn't have a configuration for RAILS_ENV=#{RAILS_ENV}."
+    	end
+    else
+    	raise StandardError, "config/modyo.yml does not exist."
+    end
+
+
+
+(/config/modyo.yml)
+
+
+    development:
+    	key: <your-modyo-key>
+    	secret: <your-modyo-secret>
+    	site: 	http://www.<your-modyo-site>.com
+
+    test:
+    	key: <your-modyo-key>
+    	secret: <your-modyo-secret>
+    	site: http://www.<your-modyo-site>.com
+
+    production:
+    	key: <your-modyo-key>
+    	secret: <your-modyo-secret>
+    	site: http://www.<your-modyo-site>.com
+       
+    
+Now is available the method authenticate_with_modyo, that will return the session[:user] variable with an authenticated user ( see below a controller example).
+
+    class SessionController < ApplicationController
+    	protect_from_forgery
+    	before_filter :authenticate_with_modyo , :only => 'login'
+    	def login
+
+    	end
+    end
+        
+
+Also is available the class Modyo::Mailer.
+
+    @user = current_user
+    subjet = "Greetins from your new added app"
+    message = "<p>Hello #{@user.name}.</p>
+        <p>You recived a email from the new modyo app.</p>
+        <p>Visit github modyo-app site for more information about the API.</p>
+        <p>Regards Modyo Team.</p>"
+    response = ::Modyo::Mailer.mail(@user, {:subjet => subjet, :message => message})
+    render :xml => response
+    
+
+This project rocks and uses MIT-LICENSE.
