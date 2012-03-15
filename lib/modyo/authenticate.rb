@@ -82,7 +82,7 @@ module Modyo
       end
 
       def modyo_admin_main_url
-        "#{modyo_account_url}/#{modyo_site_key}/admin/apps/#{MODYO['canvas_namespace']}"
+        "#{modyo_account_url}/#{modyo_site_key}/admin/apps/custom/#{MODYO['canvas_namespace']}"
       end
 
     end
