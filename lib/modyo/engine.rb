@@ -3,6 +3,9 @@ module Modyo
 
     initializer "modyo.load_config" do |app|
 
+      require 'oauth'
+      require 'nokogiri'
+
       ::MODYO = {}
 
       begin

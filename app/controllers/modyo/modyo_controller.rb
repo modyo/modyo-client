@@ -27,9 +27,6 @@ module Modyo
 
       user_info = ::Nokogiri::XML(response.body)
 
-      modyo_id = user_info.xpath('/user/uuid').text()
-
-
       session[:user] =  {:modyo_id => user_info.xpath('/user/uid').text().to_i, :token => @access_token.token,
                          :secret => @access_token.secret, :full_name => user_info.xpath('/user/full_name').text(),
                          :nickname => user_info.xpath('/user/nickname').text(), :image_url => user_info.xpath('/user/avatar').text(),
