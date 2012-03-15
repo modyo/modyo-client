@@ -2,17 +2,21 @@ module Modyo
   module Authenticate
 
     def self.included(base)
+      base.extend(ClassMethods)
+      base.extend(InstanceMethods)
 
-      base.helper_method :link_to_modyo_profile
-      base.helper_method :modyo_profile_path
-      base.helper_method :modyo_site_key
-      base.helper_method :modyo_site_url
-      base.helper_method :modyo_account_url
-      base.helper_method :modyo_account_host
-      base.helper_method :modyo_site_main_url
-      base.helper_method :modyo_site_me_url
-      base.helper_method :modyo_admin_main_url
+      base.class_eval do
+        helper_method :link_to_modyo_profile
+        helper_method :modyo_profile_path
+        helper_method :modyo_site_key
+        helper_method :modyo_site_url
+        helper_method :modyo_account_url
+        helper_method :modyo_account_host
+        helper_method :modyo_site_main_url
+        helper_method :modyo_site_me_url
+        helper_method :modyo_admin_main_url
 
+      end
     end
 
 
