@@ -1,6 +1,7 @@
 module Modyo
   class Engine < Rails::Engine
 
+
     initializer "modyo.load_config" do |app|
 
       require 'oauth'
@@ -26,20 +27,18 @@ module Modyo
 
     end
 
-    initializer "modyo.load_app_instance_data" do |app|
+    initializer "modyo.load_app" do |app|
       Modyo.setup do |config|
         config.app_root = app.root
       end
-    end
 
-    initializer "modyo.load_static_assets" do |app|
       app.middleware.use ::ActionDispatch::Static, "#{root}/public"
     end
 
-    initializer 'modyo.app_controller' do |app|
+    initializer 'modyo.load_extentions' do |app|
       ActiveSupport.on_load(:action_controller) do
-        extend Modyo::Authenticate::ClassMethods
-        include Modyo::Authenticate::InstanceMethods
+
+        include Modyo::Session
       end
     end
 
