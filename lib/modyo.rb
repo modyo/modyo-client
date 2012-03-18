@@ -16,5 +16,6 @@ end
 # Require our engine
 require "modyo/engine"
 require "modyo/mailer"
+require "modyo/feed"
 require "modyo/authenticate"
 require "modyo/version"

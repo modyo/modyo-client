@@ -1,0 +1,22 @@
+development:
+    key:
+    secret:
+    site_url: http://your-site-url
+    site_key: your-site-key
+    account_host: your-modyo-account-host
+    account_url: https://your-modyo-account-url
+    canvas_app: true
+    app_namespace: your-app-namespace
+
+
+production:
+    key:
+    secret:
+    site_url: http://your-site-url
+    site_key: your-site-key
+    account_host: your-modyo-account-host
+    account_url: https://your-modyo-account-url
+    canvas_app: true
+    app_namespace: your-app-namespace
+
+

@@ -32,15 +32,15 @@ module ModyoHelper
   end
 
   def modyo_site_main_url
-    "#{modyo_site_url}/apps/#{MODYO['canvas_namespace']}"
+    "#{modyo_site_url}/apps/#{MODYO['app_namespace']}"
   end
 
   def modyo_site_me_url
-    "#{modyo_site_url}/me/#{MODYO['canvas_namespace']}"
+    "#{modyo_site_url}/me/#{MODYO['app_namespace']}"
   end
 
   def modyo_admin_main_url
-    "#{modyo_account_url}/#{modyo_site_key}/admin/apps/custom/#{MODYO['canvas_namespace']}"
+    "#{modyo_account_url}/#{modyo_site_key}/admin/apps/custom/#{MODYO['app_namespace']}"
   end
 
 end
