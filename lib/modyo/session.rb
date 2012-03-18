@@ -125,7 +125,7 @@ module Modyo
     end
 
     def link_to_modyo_profile(user, options = {})
-      "<a href=\"#{url_for modyo_profile_path(user)}\" class=\"parent\">#{(options[:text] || user.name)}</a>"
+      "<a href=\"#{url_for modyo_profile_path(user)}\" class=\"parent\">#{(options[:text] || user.name)}</a>".html_safe
     end
 
     def modyo_profile_path(user)
@@ -163,8 +163,6 @@ module Modyo
     end
 
     def modyo_session
-
-      return session[:m_user]
 
       if session[:m_user] && session[:m_user][:modyo_id] != 0
         return session[:m_user]
