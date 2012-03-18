@@ -54,7 +54,7 @@ module Modyo
 
     def authorize_with_modyo
 
-      @request_token = SessionController.consumer.get_request_token
+      @request_token = self.class.consumer.get_request_token
       session[:m_token] = @request_token.token
       session[:m_secret] = @request_token.secret
 
@@ -65,7 +65,7 @@ module Modyo
 
       if params[:m_token] && params[:m_secret]
 
-        @request_token = ::OAuth::RequestToken.new(SessionController.consumer, session[:m_token], session[:m_secret])
+        @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
         @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
 
         response = @access_token.get("/api/profile")
