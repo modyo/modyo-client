@@ -58,44 +58,62 @@ module Modyo
       session[:m_token] = @request_token.token
       session[:m_secret] = @request_token.secret
 
+      Rails.logger.info "[Modyo::Session] Starting the login process"
+      Rails.logger.info "[Modyo::Session] Token: #{session[:m_token]}"
+      Rails.logger.info "[Modyo::Session] Secret: #{session[:m_secret]}"
+
       redirect_to @request_token.authorize_url
     end
 
     def init_modyo_session
 
-      Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer (#{params[:oauth_verifier]})"
-
       if session[:m_token] && session[:m_secret]
 
-        @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
-        @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
+        begin
 
-        response = @access_token.get("/api/profile")
+          Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer: #{params[:oauth_verifier]}"
+          Rails.logger.info "[Modyo::Session] Token: #{session[:m_token]}"
+          Rails.logger.info "[Modyo::Session] Secret: #{session[:m_secret]}"
 
-        Rails.logger.debug "[Modyo::Session] Modyo Response #{response}"
-        Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
+          @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
+          @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
 
-        user_info = ::Nokogiri::XML(response.body)
+          response = @access_token.get("/api/profile")
+
+          Rails.logger.debug "[Modyo::Session] Modyo Response #{response}"
+          Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
 
 
+          user_info = ::Nokogiri::XML(response.body)
 
-        session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
-                            :token => @access_token.token,
-                            :secret => @access_token.secret,
-                            :full_name => user_info.xpath('/user/full_name').text(),
-                            :nickname => user_info.xpath('/user/nickname').text(),
-                            :image_url => user_info.xpath('/user/avatar').text(),
-                            :birthday => user_info.xpath('/user/birthday').text(),
-                            :sex => user_info.xpath('/user/sex').text(),
-                            :country => user_info.xpath('/user/country').text(),
-                            :lang => user_info.xpath('/user/lang').text(),
-                            :email => user_info.xpath('/user/email').text(),
-                            :is_owner => user_info.xpath('/user/is_owner').text(),
-                            :is_admin => user_info.xpath('/user/is_admin').text(),
-                            :has_permissions => user_info.xpath('/user/has_permissions').text(),
-                            :access_list => user_info.xpath('/user/access_list').text(), }
 
-        clean_modyo_tokens!
+          session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
+                              :token => @access_token.token,
+                              :secret => @access_token.secret,
+                              :full_name => user_info.xpath('/user/full_name').text(),
+                              :nickname => user_info.xpath('/user/nickname').text(),
+                              :image_url => user_info.xpath('/user/avatar').text(),
+                              :birthday => user_info.xpath('/user/birthday').text(),
+                              :sex => user_info.xpath('/user/sex').text(),
+                              :country => user_info.xpath('/user/country').text(),
+                              :lang => user_info.xpath('/user/lang').text(),
+                              :email => user_info.xpath('/user/email').text(),
+                              :is_owner => user_info.xpath('/user/is_owner').text(),
+                              :is_admin => user_info.xpath('/user/is_admin').text(),
+                              :has_permissions => user_info.xpath('/user/has_permissions').text(),
+                              :access_list => user_info.xpath('/user/access_list').text(), }
+
+
+        rescue => e
+
+          flash[:error] = "Unauthorized session"
+
+          redirect_to root_path
+
+        ensure
+          clean_modyo_tokens!
+        end
+
       end
     end
 
@@ -148,7 +166,10 @@ module Modyo
     end
 
     def modyo_session
-      session[:m_user]
+      if session[:m_user] && session[:m_user][:modyo_id] != 0
+        return session[:m_user]
+      end
+      nil
     end
 
   end
