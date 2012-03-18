@@ -125,8 +125,7 @@ module Modyo
     end
 
     def link_to_modyo_profile(user, options = {})
-
-      link_to (options[:text] || user.name), modyo_profile_path(user), :class => 'parent'
+      "<a href=\"#{url_for modyo_profile_path(user)}\" class=\"parent\">#{(options[:text] || user.name)}</a>"
     end
 
     def modyo_profile_path(user)
