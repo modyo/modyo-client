@@ -22,22 +22,22 @@ module Modyo
 
     module ClassMethods
       def authenticate_with_modyo
-        if session[:user]
+        if session[:m_user]
           true
         else
-          session[:return_to] = request.url
-          redirect_to '/modyo'
+          session[:m_return] = request.url
+          redirect_to '/modyo/login'
         end
       end
     end
 
     module InstanceMethods
       def authenticate_with_modyo
-        if session[:user]
+        if session[:m_user]
           true
         else
-          session[:return_to] = request.url
-          redirect_to '/modyo'
+          session[:m_return] = request.url
+          redirect_to '/modyo/login'
         end
 
       end

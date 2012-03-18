@@ -25,7 +25,7 @@ class Modyo::SessionController < ::ApplicationController
 
     user_info = ::Nokogiri::XML(response.body)
 
-    session[:user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
+    session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
                       :token => @access_token.token,
                       :secret => @access_token.secret,
                       :full_name => user_info.xpath('/user/full_name').text(),
@@ -45,7 +45,7 @@ class Modyo::SessionController < ::ApplicationController
   end
 
   def destroy
-    session[:user] = nil
+    session[:m_user] = nil
 
     redirect_to_back
   end

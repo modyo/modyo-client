@@ -51,7 +51,7 @@ Add to your app the following files:
     	site: http://www.<your-modyo-site>.com
        
     
-Now is available the method authenticate_with_modyo, that will return the session[:user] variable with an authenticated user ( see below a controller example).
+Now is available the method authenticate_with_modyo, that will return the session[:m_user] variable with an authenticated user ( see below a controller example).
 
     class SessionController < ApplicationController
     	protect_from_forgery
