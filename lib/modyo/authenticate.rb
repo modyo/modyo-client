@@ -15,6 +15,7 @@ module Modyo
         helper_method :modyo_site_main_url
         helper_method :modyo_site_me_url
         helper_method :modyo_admin_main_url
+        helper_method :modyo_session
 
       end
     end
@@ -83,6 +84,10 @@ module Modyo
 
       def modyo_admin_main_url
         "#{modyo_account_url}/#{modyo_site_key}/admin/apps/custom/#{MODYO['app_namespace']}"
+      end
+
+      def modyo_session
+        session[:m_user]
       end
 
     end
