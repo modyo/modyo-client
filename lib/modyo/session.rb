@@ -63,7 +63,7 @@ module Modyo
 
     def init_modyo_session
 
-      if params[:m_token] && params[:m_secret]
+      if session[:m_token] && session[:m_secret]
 
         @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
         @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
