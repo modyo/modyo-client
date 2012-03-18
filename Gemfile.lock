@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    modyo (0.0.7)
+    modyo (0.1.0)
       nokogiri
       oauth (~> 0.4.2)
 
