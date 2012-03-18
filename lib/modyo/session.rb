@@ -41,12 +41,12 @@ module Modyo
 
     def require_modyo_authentication
       if modyo_session
-        true
-      else
-        session[:m_return] = request.url
-
-        authorize_with_modyo
+        return true
       end
+
+      session[:m_return] = request.url
+
+      authorize_with_modyo
     end
 
 
@@ -83,9 +83,7 @@ module Modyo
           Rails.logger.debug "[Modyo::Session] Modyo Response #{response}"
           Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
 
-
           user_info = ::Nokogiri::XML(response.body)
-
 
           session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
                               :token => @access_token.token,
@@ -166,6 +164,9 @@ module Modyo
     end
 
     def modyo_session
+
+      return session[:m_user]
+
       if session[:m_user] && session[:m_user][:modyo_id] != 0
         return session[:m_user]
       end
