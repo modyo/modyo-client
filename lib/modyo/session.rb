@@ -63,6 +63,8 @@ module Modyo
 
     def init_modyo_session
 
+      Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer"
+
       if session[:m_token] && session[:m_secret]
 
         @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
@@ -71,6 +73,8 @@ module Modyo
         response = @access_token.get("/api/profile")
 
         user_info = ::Nokogiri::XML(response.body)
+
+        Rails.logger.debug "[Modyo::Session] #{user_info}"
 
         session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
                             :token => @access_token.token,
