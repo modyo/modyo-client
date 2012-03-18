@@ -63,7 +63,7 @@ module Modyo
 
     def init_modyo_session
 
-      Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer"
+      Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer (#{params[:oauth_verifier]})"
 
       if session[:m_token] && session[:m_secret]
 
@@ -72,9 +72,12 @@ module Modyo
 
         response = @access_token.get("/api/profile")
 
+        Rails.logger.debug "[Modyo::Session] Modyo Response #{response}"
+        Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
+
         user_info = ::Nokogiri::XML(response.body)
 
-        Rails.logger.debug "[Modyo::Session] #{user_info}"
+
 
         session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
                             :token => @access_token.token,
