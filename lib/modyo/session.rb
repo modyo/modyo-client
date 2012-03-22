@@ -58,16 +58,16 @@ module Modyo
       session[:m_token] = @request_token.token
       session[:m_secret] = @request_token.secret
 
-      Rails.logger.info "[Modyo::Session] Starting the login process"
-      Rails.logger.info "[Modyo::Session] Token: #{session[:m_token]}"
-      Rails.logger.info "[Modyo::Session] Secret: #{session[:m_secret]}"
+      Rails.logger.debug "[Modyo::Session] Starting the login process"
+      Rails.logger.debug "[Modyo::Session] Token: #{session[:m_token]}"
+      Rails.logger.debug "[Modyo::Session] Secret: #{session[:m_secret]}"
 
       redirect_to @request_token.authorize_url
     end
 
     def init_modyo_session
 
-      if session[:m_token] && session[:m_secret]
+      if session[:m_token] && session[:m_token] ==  params[:oauth_token] && session[:m_secret]
 
         begin
 
@@ -100,7 +100,6 @@ module Modyo
                               :is_admin => user_info.xpath('/user/is_admin').text(),
                               :has_permissions => user_info.xpath('/user/has_permissions').text(),
                               :access_list => user_info.xpath('/user/access_list').text(), }
-
 
         rescue => e
 
@@ -164,9 +163,17 @@ module Modyo
 
     def modyo_session
 
+      Rails.logger.debug "[Modyo::Session] Getting the modyo session: #{session[:m_user].inspect}"
+
       if session[:m_user] && session[:m_user][:modyo_id] != 0
+
+        Rails.logger.debug "[Modyo::Session] Session found for modyo_id: #{session[:m_user][:modyo_id]}"
+
         return session[:m_user]
       end
+
+      Rails.logger.debug "[Modyo::Session] Session not found :("
+
       nil
     end
 
