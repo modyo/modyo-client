@@ -1,6 +1,6 @@
 module Modyo
-  class Mailer
-   def self.mail(user, options = {})
+  class Feed
+   def self.feed(user, options = {})
 
      @access_token = ::OAuth::AccessToken.new(self.class.consumer, user.oauth_token, user.oauth_secret)
      response = @access_token.post("/api/mailer", {:recipient => user.modyo_id, :message => options[:message], :subject => options[:subject]})
