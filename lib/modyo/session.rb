@@ -40,11 +40,18 @@ module Modyo
     # Instance Methods
 
     def require_modyo_authentication
+
+      Rails.logger.debug "[Modyo::Session] Modyo Authentication filter required"
+
       if modyo_session
+
+        Rails.logger.debug "[Modyo::Session] Session found!"
         return true
       end
 
-      session[:m_return] = request.url
+      session[:m_return] = request.url  # Remember the URL of the intended resource
+
+      Rails.logger.debug "[Modyo::Session] Modyo Session not found. Starting the authorization process..."
 
       authorize_with_modyo
     end
@@ -67,18 +74,21 @@ module Modyo
 
     def init_modyo_session
 
+      Rails.logger.debug "[Modyo::Session] Entering in the Modyo session initialization..."
+      Rails.logger.debug "[Modyo::Session] Stored Token: #{session[:m_token]}"
+      Rails.logger.debug "[Modyo::Session] Received Token: #{params[:oauth_token]}"
+      Rails.logger.debug "[Modyo::Session] Session Secret: #{session[:m_secret]}"
+
       if session[:m_token] && session[:m_token] == params[:oauth_token] && session[:m_secret]
 
         begin
 
-          Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer: #{params[:oauth_verifier]}"
-          Rails.logger.info "[Modyo::Session] Token: #{session[:m_token]}"
-          Rails.logger.info "[Modyo::Session] Secret: #{session[:m_secret]}"
-
           @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
           @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
 
+          Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info"
           response = @access_token.get("/api/profile")
+
 
           Rails.logger.debug "[Modyo::Session] Modyo Response #{response}"
           Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
