@@ -44,7 +44,7 @@ module Modyo
         return true
       end
 
-      cookies[:m_return] = request.url
+      session[:m_return] = request.url
 
       authorize_with_modyo
     end
@@ -55,27 +55,27 @@ module Modyo
     def authorize_with_modyo
 
       @request_token = self.class.consumer.get_request_token
-      cookies[:m_token] = @request_token.token
-      cookies[:m_secret] = @request_token.secret
+      session[:m_token] = @request_token.token
+      session[:m_secret] = @request_token.secret
 
       Rails.logger.debug "[Modyo::Session] Starting the login process"
-      Rails.logger.debug "[Modyo::Session] Token: #{cookies[:m_token]}"
-      Rails.logger.debug "[Modyo::Session] Secret: #{cookies[:m_secret]}"
+      Rails.logger.debug "[Modyo::Session] Token: #{session[:m_token]}"
+      Rails.logger.debug "[Modyo::Session] Secret: #{session[:m_secret]}"
 
       redirect_to @request_token.authorize_url
     end
 
     def init_modyo_session
 
-      if cookies[:m_token] && cookies[:m_token] ==  params[:oauth_token] && cookies[:m_secret]
+      if session[:m_token] && session[:m_token] == params[:oauth_token] && session[:m_secret]
 
         begin
 
           Rails.logger.info "[Modyo::Session] Entering to the modyo session initializer: #{params[:oauth_verifier]}"
-          Rails.logger.info "[Modyo::Session] Token: #{cookies[:m_token]}"
-          Rails.logger.info "[Modyo::Session] Secret: #{cookies[:m_secret]}"
+          Rails.logger.info "[Modyo::Session] Token: #{session[:m_token]}"
+          Rails.logger.info "[Modyo::Session] Secret: #{session[:m_secret]}"
 
-          @request_token = ::OAuth::RequestToken.new(self.class.consumer, cookies[:m_token], cookies[:m_secret])
+          @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
           @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
 
           response = @access_token.get("/api/profile")
@@ -85,7 +85,7 @@ module Modyo
 
           user_info = ::Nokogiri::XML(response.body)
 
-          cookies[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
+          session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
                               :token => @access_token.token,
                               :secret => @access_token.secret,
                               :full_name => user_info.xpath('/user/full_name').text(),
@@ -115,12 +115,12 @@ module Modyo
     end
 
     def destroy_modyo_session!
-      cookies[:m_user] = nil
+      session[:m_user] = nil
     end
 
     def clean_modyo_tokens!
-      cookies[:m_token] = nil
-      cookies[:m_secret] = nil
+      session[:m_token] = nil
+      session[:m_secret] = nil
     end
 
     def link_to_modyo_profile(user, options = {})
@@ -163,13 +163,13 @@ module Modyo
 
     def modyo_session
 
-      Rails.logger.debug "[Modyo::Session] Getting the modyo session: #{cookies[:m_user].inspect}"
+      Rails.logger.debug "[Modyo::Session] Getting the modyo session: #{session[:m_user].inspect}"
 
-      if cookies[:m_user] && cookies[:m_user][:modyo_id] != 0
+      if session[:m_user] && session[:m_user][:modyo_id] != 0
 
-        Rails.logger.debug "[Modyo::Session] session found for modyo_id: #{cookies[:m_user][:modyo_id]}"
+        Rails.logger.debug "[Modyo::Session] session found for modyo_id: #{session[:m_user][:modyo_id]}"
 
-        return cookies[:m_user]
+        return session[:m_user]
       end
 
       Rails.logger.debug "[Modyo::Session] session not found :("
