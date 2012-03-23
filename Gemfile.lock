@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    modyo (0.2.9)
+    modyo (0.3.0)
       nokogiri
       oauth (~> 0.4.2)
       rack-p3p
