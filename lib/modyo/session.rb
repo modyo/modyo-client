@@ -128,7 +128,8 @@ module Modyo
     end
 
     def set_p3p_headers
-      headers['P3P'] = 'CP="ALL DSP COR CURa ADMa DEVa OUR IND COM NAV"'
+      headers['P3P'] = 'CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"'
+
     end
 
     def destroy_modyo_session!
