@@ -1,6 +1,8 @@
 module Modyo
   module Session
 
+    POLICY = 'CP="NOI ADM DEV PSAi COM NAV OUR OTRo STP IND DEM"'
+
     def self.included(base)
       base.extend(ClassMethods)
 
@@ -8,6 +10,7 @@ module Modyo
 
         # Filters
 
+        before_filter :set_p3p_headers
         before_filter :init_modyo_session
 
 
@@ -49,7 +52,7 @@ module Modyo
         return true
       end
 
-      session[:m_return] = request.url  # Remember the URL of the intended resource
+      session[:m_return] = request.url # Remember the URL of the intended resource
 
       Rails.logger.debug "[Modyo::Session] Modyo Session not found. Starting the authorization process..."
 
@@ -122,6 +125,10 @@ module Modyo
         end
 
       end
+    end
+
+    def set_p3p_headers
+      headers['P3P'] = 'CP="ALL DSP COR CURa ADMa DEVa OUR IND COM NAV"'
     end
 
     def destroy_modyo_session!

@@ -30,11 +30,8 @@ module Modyo
     initializer "modyo.load_app" do |app|
       Modyo.setup do |config|
         config.app_root = app.root
-
-
       end
 
-      app.middleware.insert_before ActionDispatch::Session::CookieStore, Rack::P3p
       app.middleware.use ::ActionDispatch::Static, "#{root}/public"
     end
 
