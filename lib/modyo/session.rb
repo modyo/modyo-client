@@ -17,7 +17,7 @@ module Modyo
         # Helpers
 
         helper_method :link_to_modyo_profile
-        helper_method :modyo_profile_path
+        helper_method :modyo_admin_profile_url
         helper_method :modyo_site_key
         helper_method :modyo_site_url
         helper_method :modyo_account_url
@@ -142,11 +142,7 @@ module Modyo
     end
 
     def link_to_modyo_profile(user, options = {})
-      "<a href=\"#{url_for modyo_profile_path(user)}\" class=\"parent\">#{(options[:text] || user.name)}</a>".html_safe
-    end
-
-    def modyo_profile_path(user)
-      "/#{modyo_site_key}/admin/people/members/show?membership_id=#{user.modyo_id}"
+      "<a href=\"#{modyo_admin_profile_url(user)}\" class=\"parent\">#{(options[:text] || user.name)}</a>".html_safe
     end
 
     # Parameters
@@ -177,6 +173,10 @@ module Modyo
 
     def modyo_admin_main_url
       "#{modyo_account_url}/#{modyo_site_key}/admin/apps/custom/#{MODYO['app_namespace']}"
+    end
+
+    def modyo_admin_profile_url(user)
+      "#{modyo_account_url}/#{modyo_site_key}/admin/people/members/show?membership_id=#{user.modyo_id}"
     end
 
     def modyo_session
