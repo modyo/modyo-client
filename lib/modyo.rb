@@ -17,5 +17,6 @@ end
 require "modyo/engine"
 require "modyo/mailer"
 require "modyo/feed"
+require "modyo/target"
 require "modyo/session"
 require "modyo/version"
