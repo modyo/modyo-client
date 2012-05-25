@@ -1,4 +1,4 @@
-= Modyo Connect Gem version 0.0.1
+= Modyo SDK Engine
 
 Install
 If you're using Bundle add this your gemfile:
