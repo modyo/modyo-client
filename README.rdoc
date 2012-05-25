@@ -6,31 +6,6 @@ If you're using Bundle add this your gemfile:
     gem 'modyo', :git => 'git://github.com/modyo/modyo.git'
 
 Add to your app the following files:
-(/config/initializers/modyo.rb)
-
-
-    require 'oauth'
-    require 'nokogiri'
-
-    ::MODYO = {}
-    begin
-    	yaml_file = YAML.load_file("#{Rails.root}/config/modyo.yml")
-    
-    rescue Exception => e
-    		raise StandardError, "config/modyo.yml could not be loaded."
-    end
-    
-    if yaml_file
-    	if yaml_file[Rails.env]
-    		MODYO.merge!(yaml_file[Rails.env])
-  	else
-    		raise StandardError, "config/modyo.yml exists, but doesn't have a configuration for RAILS_ENV=#{RAILS_ENV}."
-    	end
-    else
-    	raise StandardError, "config/modyo.yml does not exist."
-    end
-
-
 
 (/config/modyo.yml)
 
@@ -53,12 +28,11 @@ Add to your app the following files:
     
 Now is available the method authenticate_with_modyo, that will return the session[:m_user] variable with an authenticated user ( see below a controller example).
 
-    class SessionController < ApplicationController
-    	protect_from_forgery
-    	before_filter :authenticate_with_modyo , :only => 'login'
-    	def login
+    class ExampleController < ApplicationController
+    
+    	before_filter :authenticate_with_modyo 
 
-    	end
+
     end
         
 
@@ -73,5 +47,3 @@ Also is available the class Modyo::Mailer.
     response = ::Modyo::Mailer.mail(@user, {:subjet => subjet, :message => message})
     render :xml => response
     
-
-This project rocks and uses MIT-LICENSE.
