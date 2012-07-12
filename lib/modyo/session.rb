@@ -113,7 +113,8 @@ module Modyo
                               :is_admin => user_info.xpath('/user/is_admin').text(),
                               :has_permissions => user_info.xpath('/user/has_permissions').text(),
                               :access_list => user_info.xpath('/user/access_list').text(),
-                              :targets => user_info.xpath('/user/targets').text()}
+                              :targets => user_info.xpath('/user/targets').text(),
+                              :targets_ids => user_info.xpath('/user/targets_ids').text()}
 
         rescue => e
 
