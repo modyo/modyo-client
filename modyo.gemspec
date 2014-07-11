@@ -15,9 +15,8 @@ Gem::Specification.new do |s|
   s.summary = "modyo-#{s.version}"
 
 
-  s.add_dependency "oauth", "~> 0.4.2"
+  s.add_dependency "oauth2"
   s.add_dependency "rack-p3p"
-  s.add_dependency "nokogiri"
 
   s.files = `git ls-files`.split("\n")
   s.executables = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }

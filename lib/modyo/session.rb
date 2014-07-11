@@ -35,7 +35,10 @@ module Modyo
 
     module ClassMethods
       def consumer
-        ::OAuth::Consumer.new(MODYO["key"], MODYO["secret"], :site => MODYO["site_url"])
+
+        #::OAuth2::Client.new(Rails.application.secrets.modyo_client_id, Rails.application.secrets.modyo_client_secret, :site => Rails.application.secrets.modyo_account_url)
+
+        ::OAuth2::Client.new(MODYO["key"], MODYO["secret"], :site => MODYO["account_url"])
       end
     end
 
@@ -64,63 +67,40 @@ module Modyo
 
     def authorize_with_modyo
 
-      @request_token = self.class.consumer.get_request_token
-      session[:m_token] = @request_token.token
-      session[:m_secret] = @request_token.secret
+      @access_token = self.class.consumer.client_credentials.get_token
+      session[:m_token] = @access_token.token
 
       Rails.logger.debug "[Modyo::Session] Starting the login process"
       Rails.logger.debug "[Modyo::Session] Token: #{session[:m_token]}"
-      Rails.logger.debug "[Modyo::Session] Secret: #{session[:m_secret]}"
 
-      redirect_to @request_token.authorize_url
+      Rails.logger.debug "[Modyo::Session] Redirect to : #{@access_token.authorize_url}"
+      redirect_to @access_token.authorize_url
     end
 
     def init_modyo_session
 
       Rails.logger.debug "[Modyo::Session] Entering in the Modyo session initialization..."
       Rails.logger.debug "[Modyo::Session] Stored Token: #{session[:m_token]}"
-      Rails.logger.debug "[Modyo::Session] Received Token: #{params[:oauth_token]}"
-      Rails.logger.debug "[Modyo::Session] Session Secret: #{session[:m_secret]}"
 
-      if session[:m_token] && session[:m_token] == params[:oauth_token] && session[:m_secret]
-
+      if session[:m_token]
         begin
 
-          @request_token = ::OAuth::RequestToken.new(self.class.consumer, session[:m_token], session[:m_secret])
-          @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
+          @access_token = self.class.consumer.client_credentials.get_token
 
-          Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info"
-          response = @access_token.get("/api/profile")
+          profile_api_url = "#{MODYO["account_url"]}api/v1/users/me"
+          Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info from #{profile_api_url}"
+          response = @access_token.get(profile_api_url)
 
-
-          Rails.logger.debug "[Modyo::Session] Modyo Response #{response}"
           Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
 
-          user_info = ::Nokogiri::XML(response.body)
+          user_info = JSON.parse response.body
 
-          session[:m_user] = {:modyo_id => user_info.xpath('/user/uid').text().to_i,
-                              :token => @access_token.token,
-                              :secret => @access_token.secret,
-                              :full_name => user_info.xpath('/user/full_name').text(),
-                              :nickname => user_info.xpath('/user/nickname').text(),
-                              :image_url => user_info.xpath('/user/avatar').text(),
-                              :birthday => user_info.xpath('/user/birthday').text(),
-                              :sex => user_info.xpath('/user/sex').text(),
-                              :country => user_info.xpath('/user/country').text(),
-                              :lang => user_info.xpath('/user/lang').text(),
-                              :email => user_info.xpath('/user/email').text(),
-                              :is_owner => user_info.xpath('/user/is_owner').text(),
-                              :is_admin => user_info.xpath('/user/is_admin').text(),
-                              :has_permissions => user_info.xpath('/user/has_permissions').text(),
-                              :access_list => user_info.xpath('/user/access_list').text(),
-                              :targets => user_info.xpath('/user/targets').text(),
-                              :targets_ids => user_info.xpath('/user/targets_ids').text()}
+          session[:m_user] = {:token => @access_token.token}.merge!(user_info)
 
-        rescue => e
+        rescue Exception => ex
 
-          flash[:error] = "Unauthorized Session"
-
-          redirect_to root_path
+          flash[:error] = "Unauthorized Session #{ex.message}"
+          #redirect_to root_path
 
         ensure
           clean_modyo_tokens!
@@ -140,7 +120,6 @@ module Modyo
 
     def clean_modyo_tokens!
       session[:m_token] = nil
-      session[:m_secret] = nil
     end
 
     def link_to_modyo_profile(user, options = {})
@@ -178,16 +157,16 @@ module Modyo
     end
 
     def modyo_admin_profile_url(user)
-      "#{modyo_account_url}/#{modyo_site_key}/admin/people/members/show?membership_id=#{user.modyo_id}"
+      "#{modyo_account_url}/profile"
     end
 
     def modyo_session
 
       Rails.logger.debug "[Modyo::Session] Getting the modyo session: #{session[:m_user].inspect}"
 
-      if session[:m_user] && session[:m_user][:modyo_id] != 0
+      if session[:m_user] && session[:m_user][:id] != 0
 
-        Rails.logger.debug "[Modyo::Session] session found for modyo_id: #{session[:m_user][:modyo_id]}"
+        Rails.logger.debug "[Modyo::Session] session found for modyo_id: #{session[:m_user][:id]}"
 
         return session[:m_user]
       end
