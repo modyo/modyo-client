@@ -1,6 +1,7 @@
 development:
     key:
     secret:
+    callback_url: http://your-app-callback-url
     site_url: http://your-site-url
     site_key: your-site-key
     account_host: your-modyo-account-host
@@ -12,6 +13,7 @@ development:
 production:
     key:
     secret:
+    callback_url: http://your-app-callback-url
     site_url: http://your-site-url
     site_key: your-site-key
     account_host: your-modyo-account-host

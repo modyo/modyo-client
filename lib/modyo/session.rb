@@ -38,7 +38,13 @@ module Modyo
 
         #::OAuth2::Client.new(Rails.application.secrets.modyo_client_id, Rails.application.secrets.modyo_client_secret, :site => Rails.application.secrets.modyo_account_url)
 
-        ::OAuth2::Client.new(MODYO["key"], MODYO["secret"], :site => MODYO["account_url"])
+        ::OAuth2::Client.new(
+            MODYO['key'],
+            MODYO['secret'],
+            :authorize_url => '/oauth/authorize',
+            :token_url => '/oauth/token',
+            :site => MODYO['account_url']
+        )
       end
     end
 
@@ -67,59 +73,63 @@ module Modyo
 
     def authorize_with_modyo
 
-      @access_token = self.class.consumer.client_credentials.get_token
-      session[:m_token] = @access_token.token
+      Rails.logger.debug "[Modyo::Session] Redirecting to Authorize URL: #{MODYO['account_url']}/oauth/authorize"
+      Rails.logger.debug "[Modyo::Session] Return to: #{MODYO['callback_url']}"
 
-      Rails.logger.debug "[Modyo::Session] Starting the login process"
-      Rails.logger.debug "[Modyo::Session] Token: #{session[:m_token]}"
-
-      Rails.logger.debug "[Modyo::Session] Redirect to : #{@access_token.authorize_url}"
-      redirect_to @access_token.authorize_url
+      redirect_to self.class.consumer.auth_code.authorize_url(:redirect_uri => MODYO['callback_url'])
     end
 
     def init_modyo_session
 
       Rails.logger.debug "[Modyo::Session] Entering in the Modyo session initialization..."
-      Rails.logger.debug "[Modyo::Session] Stored Token: #{session[:m_token]}"
+      Rails.logger.debug "[Modyo::Session] Authorization Code: #{params[:code]}"
 
-      if session[:m_token]
-        begin
 
-          @access_token = self.class.consumer.client_credentials.get_token
+      begin
+        @access_token = self.class.consumer.auth_code.get_token(params[:code], :redirect_uri => MODYO['callback_url']) if params[:code]
 
-          profile_api_url = "#{MODYO["account_url"]}api/v1/users/me"
-          Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info from #{profile_api_url}"
-          response = @access_token.get(profile_api_url)
+        profile_api_url = "#{MODYO["account_url"]}/api/v1/users/me"
 
-          Rails.logger.debug "[Modyo::Session] Modyo Response Body #{response.body}"
+        Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info from #{profile_api_url}"
 
-          user_info = JSON.parse response.body
+        response = @access_token.get(profile_api_url)
 
-          session[:m_user] = {:token => @access_token.token}.merge!(user_info)
+        user_info = JSON.parse response.body
 
-        rescue Exception => ex
+        session[:m_user] = {:token => @access_token.token}.merge!(user_info.symbolize_keys)
 
-          flash[:error] = "Unauthorized Session #{ex.message}"
-          #redirect_to root_path
+        Rails.logger.debug "[Modyo::Session] Modyo User Stored: #{session[:m_user]}"
 
-        ensure
-          clean_modyo_tokens!
-        end
+      rescue Exception => ex
 
+        flash[:error] = "Unauthorized Session #{ex.message}"
+        redirect_to root_path
       end
+
     end
 
-    def set_p3p_headers
-      headers['P3P'] = 'CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"'
+    def modyo_session
 
+      Rails.logger.debug "[Modyo::Session] Getting the modyo session: #{session[:m_user].inspect}"
+
+      if session[:m_user] && session[:m_user][:id] != 0
+
+        Rails.logger.debug "[Modyo::Session] session found for: #{session[:m_user][:email]}"
+
+        return session[:m_user]
+      end
+
+      Rails.logger.debug "[Modyo::Session] session not found :("
+
+      nil
     end
 
     def destroy_modyo_session!
       session[:m_user] = nil
     end
 
-    def clean_modyo_tokens!
-      session[:m_token] = nil
+    def set_p3p_headers
+      headers['P3P'] = 'CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"'
     end
 
     def link_to_modyo_profile(user, options = {})
@@ -158,22 +168,6 @@ module Modyo
 
     def modyo_admin_profile_url(user)
       "#{modyo_account_url}/profile"
-    end
-
-    def modyo_session
-
-      Rails.logger.debug "[Modyo::Session] Getting the modyo session: #{session[:m_user].inspect}"
-
-      if session[:m_user] && session[:m_user][:id] != 0
-
-        Rails.logger.debug "[Modyo::Session] session found for modyo_id: #{session[:m_user][:id]}"
-
-        return session[:m_user]
-      end
-
-      Rails.logger.debug "[Modyo::Session] session not found :("
-
-      nil
     end
 
   end
