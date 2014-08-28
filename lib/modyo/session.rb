@@ -46,6 +46,7 @@ module Modyo
             :site => MODYO['account_url']
         )
       end
+
     end
 
 
@@ -84,28 +85,26 @@ module Modyo
       Rails.logger.debug "[Modyo::Session] Entering in the Modyo session initialization..."
       Rails.logger.debug "[Modyo::Session] Authorization Code: #{params[:code]}"
 
+      if params[:code]
+        begin
+          @access_token = self.class.consumer.auth_code.get_token(params[:code], :redirect_uri => MODYO['callback_url'])
 
-      begin
-        @access_token = self.class.consumer.auth_code.get_token(params[:code], :redirect_uri => MODYO['callback_url']) if params[:code]
+          profile_api_url = "#{MODYO["account_url"]}/api/v1/users/me"
 
-        profile_api_url = "#{MODYO["account_url"]}/api/v1/users/me"
+          Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info from #{profile_api_url}"
 
-        Rails.logger.debug "[Modyo::Session] Requesting for Modyo user profile info from #{profile_api_url}"
+          response = @access_token.get(profile_api_url)
 
-        response = @access_token.get(profile_api_url)
+          user_info = JSON.parse response.body
 
-        user_info = JSON.parse response.body
+          session[:m_user] = {:token => @access_token.token}.merge!(user_info.symbolize_keys)
 
-        session[:m_user] = {:token => @access_token.token}.merge!(user_info.symbolize_keys)
+          Rails.logger.debug "[Modyo::Session] Modyo User Stored: #{session[:m_user]}"
 
-        Rails.logger.debug "[Modyo::Session] Modyo User Stored: #{session[:m_user]}"
-
-      rescue Exception => ex
-
-        flash[:error] = "Unauthorized Session #{ex.message}"
-        redirect_to root_path
+        rescue Exception => ex
+          flash[:error] = "Unauthorized Session #{ex.message}"
+        end
       end
-
     end
 
     def modyo_session
