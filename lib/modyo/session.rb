@@ -145,6 +145,10 @@ module Modyo
       MODYO['site_url']
     end
 
+    def modyo_site_id
+      MODYO['site_id']
+    end
+
     def modyo_account_url
       MODYO['account_url']
     end
