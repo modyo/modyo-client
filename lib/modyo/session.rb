@@ -170,7 +170,7 @@ module Modyo
     end
 
     def modyo_admin_profile_url(user)
-      "#{modyo_account_url}/profile"
+      "#{modyo_account_url}/admin/users?query="+user.email
     end
 
   end
