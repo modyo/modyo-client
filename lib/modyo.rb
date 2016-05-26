@@ -1,7 +1,6 @@
-require "active_support/dependencies"
+require 'modyo/engine'
 
 module Modyo
-
   # Our host application root path
   # We set this when the engine is initialized
   mattr_accessor :app_root
@@ -10,10 +9,4 @@ module Modyo
   def self.setup
     yield self
   end
-
 end
-
-# Require our engine
-require "modyo/engine"
-require "modyo/session"
-require "modyo/version"

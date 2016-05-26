@@ -9,20 +9,17 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,lib,config}/**/*"] + ["MIT-LICENSE", "Rakefile", "Gemfile", "README.rdoc"]
   s.version = Modyo::VERSION
   s.platform = Gem::Platform::RUBY
-  s.authors = ["Ivan Gonzalez <itech>", "Toño Silva Portell <jcode>"]
-  s.email = ["support@modyo.com"]
-  s.homepage = "http://www.modyo.com"
+  s.authors = ['Ivan Gonzalez <itech>', 'Toño Silva Portell <jcode>']
+  s.email = ['support@modyo.com']
+  s.homepage = 'http://www.modyo.com'
   s.summary = "modyo-#{s.version}"
-
 
   s.add_dependency "oauth2"
   s.add_dependency "rack-p3p"
+  s.add_dependency "activesupport", "~> 4.2"
+  s.add_dependency "rails", "~> 4.2"
 
   s.files = `git ls-files`.split("\n")
   s.executables = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
-
-
 end
-
-
