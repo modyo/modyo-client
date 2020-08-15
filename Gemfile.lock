@@ -11,7 +11,7 @@ GEM
   specs:
     nokogiri (1.5.2)
     oauth (0.4.5)
-    rack (1.4.1)
+    rack (2.2.3)
     rack-p3p (0.5.0)
       rack (>= 1.0.1)
 
