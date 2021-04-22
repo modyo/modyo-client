@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.summary = "modyo-#{s.version}"
 
 
-  s.add_dependency "oauth", "~> 0.4.2"
+  s.add_dependency "oauth", ">= 0.4.2", "< 0.6.0"
   s.add_dependency "rack-p3p"
   s.add_dependency "nokogiri"
 

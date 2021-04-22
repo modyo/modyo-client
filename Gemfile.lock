@@ -3,15 +3,19 @@ PATH
   specs:
     modyo (0.3.9)
       nokogiri
-      oauth (~> 0.4.2)
+      oauth (>= 0.4.2, < 0.6.0)
       rack-p3p
 
 GEM
   remote: http://rubygems.org/
   specs:
-    nokogiri (1.5.2)
-    oauth (0.4.5)
-    rack (1.4.1)
+    mini_portile2 (2.5.0)
+    nokogiri (1.11.3)
+      mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
+    oauth (0.5.6)
+    racc (1.5.2)
+    rack (2.2.3)
     rack-p3p (0.5.0)
       rack (>= 1.0.1)
 
